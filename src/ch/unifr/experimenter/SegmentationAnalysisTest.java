@@ -5,10 +5,10 @@
 
 package ch.unifr.experimenter;
 
+import org.junit.jupiter.api.Test;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
-import org.junit.jupiter.api.Test;
 
 /**
  * This class test whether the class SegmentationAnalysis is correct
@@ -180,4 +180,5 @@ public class SegmentationAnalysisTest {
         assert (results[9] == 1);
         assert (results[10] == 1);
     }
+
 }
