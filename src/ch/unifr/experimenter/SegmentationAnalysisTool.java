@@ -48,7 +48,7 @@ public class SegmentationAnalysisTool {
             if (evalPath.lastIndexOf(File.separator) != evalPath.length()) {
                 evalPath += File.separator;
             }
-            evalPath += outputImagePath.substring(0, outputImagePath.lastIndexOf('.'));
+            evalPath += outputImagePath.substring(outputImagePath.lastIndexOf(File.separator) + 1, outputImagePath.lastIndexOf('.'));
             evalPath += ".visualization.png";
             ImageIO.write(segmentationAnalysis.visualiseEvaluation(), "png", new File(evalPath));
             System.out.println("Visualization image written in: " + evalPath);
