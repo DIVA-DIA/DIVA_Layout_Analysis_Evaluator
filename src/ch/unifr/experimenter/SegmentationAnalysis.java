@@ -64,7 +64,6 @@ public class SegmentationAnalysis {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
     /**
      * This is expected constructor of the class, which takes as parameter the BufferedImages of
      * the ground truth and the predicted values.
@@ -95,7 +94,6 @@ public class SegmentationAnalysis {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Public
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
     /**
      * This method perform the evaluation of the image containing the prediction by comparing it
      * with the ground truth provided. This evaluation is conducted on a multi-class and multi-label
@@ -291,7 +289,6 @@ public class SegmentationAnalysis {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Getters
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
     public double[] getFrequencies() {
         return frequencies;
     }
@@ -319,7 +316,6 @@ public class SegmentationAnalysis {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Private
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
     /**
      * Computes the mean of the values passed as parameter
      * @param values vector of values to compute the mean on
@@ -344,8 +340,10 @@ public class SegmentationAnalysis {
         double weightedMean = 0;
         double totalWeight = 0;
         for (int c = 0; c < values.length; c++) {
-            weightedMean += values[c] * weights[c];
-            totalWeight += weights[c];
+            if (!Double.isNaN(values[c])) {
+                weightedMean += values[c] * weights[c];
+                totalWeight += weights[c];
+            }
         }
         return weightedMean / totalWeight;
     }
@@ -396,6 +394,7 @@ public class SegmentationAnalysis {
         }
         return tp/totalAmountOfLabels;
     }
+
 
     /**
      * Computes class-wise Intersection over Union metric, from the class-wise binary confusion matrices

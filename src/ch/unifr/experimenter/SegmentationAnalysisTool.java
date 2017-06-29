@@ -34,13 +34,14 @@ public class SegmentationAnalysisTool {
         double[] results = segmentationAnalysis.evaluateImages();
 
         // Print the metric used to determine winner in competition
-        System.out.println("Mean UI (JaccardIndex) = " + results[2]);
+        System.out.printf("Mean IU (Jaccard index) = %.5f\n", results[2]);
 
         // Print all metrics computed
         System.out.print("Additional scores: ");
         for (double result : results) {
-            System.out.print(result + " ");
+            System.out.printf("%.5f ", result);
         }
+        System.out.print("\n");
 
         // If desired, visualize the evaluation and save the image on file
         if (args.length == 3) {
