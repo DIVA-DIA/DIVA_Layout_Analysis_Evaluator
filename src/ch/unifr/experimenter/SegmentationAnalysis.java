@@ -73,7 +73,7 @@ public class SegmentationAnalysis {
      */
     public SegmentationAnalysis(final BufferedImage gtImage,
                                 final BufferedImage predictionImage,
-                                final int nbClasses) throws IOException {
+                                final int nbClasses) {
         this.gtImage = gtImage;
         this.predictionImage = predictionImage;
         this.nbClasses = nbClasses;
@@ -94,6 +94,74 @@ public class SegmentationAnalysis {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Public
     ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * This method takes many values as parameter and gathers them in a nice and consistent way.
+     * It is helpful if a human want to interpret the values visually without the aid of a third
+     * party software.
+     * It is implemented in a static method and not in the toString() to enable printing averaged
+     * values (done externally of this class).
+     *
+     * @param evaluation  see evaluation variable of this class
+     * @param jaccard     see jaccard variable of this class
+     * @param f1          see f1 variable of this class
+     * @param precision   see precision variable of this class
+     * @param recall      see recall variable of this class
+     * @param frequencies see frequencies variable of this class
+     * @return a string containing all values passed as parameter nicely formatted
+     */
+    public static String prettyPrint(double[] evaluation,
+                                     double[] jaccard,
+                                     double[] f1,
+                                     double[] precision,
+                                     double[] recall,
+                                     double[] frequencies) {
+
+        StringBuilder s = new StringBuilder();
+
+        s.append(" EM=").append(String.format("%2.2f", evaluation[0]));
+
+        s.append(" HL=").append(String.format("%2.2f", evaluation[1]));
+
+        s.append(" IU=").append(String.format("%2.2f", evaluation[2])).append(",").append(String.format("%2.2f", evaluation[3]));
+        s.append("[");
+        for (int i = 0; i < jaccard.length; i++) {
+            s.append(String.format("%2.2f", jaccard[i])).append((i < jaccard.length - 1) ? "|" : "");
+        }
+        s.append("]");
+
+        s.append(" ACC=").append(String.format("%2.2f", evaluation[4]));
+
+        s.append(" F1=").append(String.format("%2.2f", evaluation[5])).append(",").append(String.format("%2.2f", evaluation[8]));
+        s.append("[");
+        for (int i = 0; i < f1.length; i++) {
+            s.append(String.format("%2.2f", f1[i])).append((i < f1.length - 1) ? "|" : "");
+        }
+        s.append("]");
+
+        s.append(" P=").append(String.format("%2.2f", evaluation[6])).append(",").append(String.format("%2.2f", evaluation[9]));
+        s.append("[");
+        for (int i = 0; i < precision.length; i++) {
+            s.append(String.format("%2.2f", precision[i])).append((i < precision.length - 1) ? "|" : "");
+        }
+        s.append("]");
+
+        s.append(" R=").append(String.format("%2.2f", evaluation[7])).append(",").append(String.format("%2.2f", evaluation[10]));
+        s.append("[");
+        for (int i = 0; i < recall.length; i++) {
+            s.append(String.format("%2.2f", recall[i])).append((i < recall.length - 1) ? "|" : "");
+        }
+        s.append("]");
+
+        s.append("Freq:[");
+        for (int i = 0; i < frequencies.length; i++) {
+            s.append(String.format("%2.2f", frequencies[i])).append((i < frequencies.length - 1) ? "|" : "");
+        }
+        s.append("]");
+
+        return s.toString();
+    }
+
     /**
      * This method perform the evaluation of the image containing the prediction by comparing it
      * with the ground truth provided. This evaluation is conducted on a multi-class and multi-label
@@ -284,6 +352,18 @@ public class SegmentationAnalysis {
         }
 
         return bi;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Public-static
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @return this evaluation object nicely formatted
+     */
+    @Override
+    public String toString() {
+        return prettyPrint(evaluation, jaccard, f1, precision, recall,frequencies);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
