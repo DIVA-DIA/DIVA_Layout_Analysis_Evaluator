@@ -10,11 +10,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import org.apache.commons.cli.*;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.PrintWriter;
+import java.io.*;
+import java.net.URLConnection;
 
 /**
  * This class provides a runnable main for using the SegmentationAnalysis tool
@@ -53,7 +54,7 @@ public class LayoutAnalysisEvaluator {
         options.addOption(new Option("out", "outputPath", true, "Output path, relative to prediction input path"));
 
         // Result file as JSON (optional)
-        options.addOption(new Option("j", "json", false, "Flag whether the JSON output is desired"));
+        options.addOption(new Option("j", "json", true, "Json Path, for the DIVAServices JSON output"));
 
         // Parse arguments
         CommandLine cmd;
@@ -101,10 +102,12 @@ public class LayoutAnalysisEvaluator {
         // Print all metrics computed
         System.out.println(segmentationAnalysis);
 
+        BufferedImage visualization = null;
         // If desired, visualize the evaluation and save the image on file
+        String visualizationFilePath = null;
         if(!cmd.hasOption("DisableVisualization")) {
-            String visualizationFilePath = outputPath + ".visualization.png";
-            BufferedImage visualization = segmentationAnalysis.visualiseEvaluation();
+            visualizationFilePath = outputPath + ".visualization.png";
+            visualization = segmentationAnalysis.visualiseEvaluation();
             ImageIO.write(visualization, "png", new File(visualizationFilePath));
             System.out.println("Visualization image written in: " + visualizationFilePath);
 
@@ -117,7 +120,7 @@ public class LayoutAnalysisEvaluator {
 
         // If desired write JSON output
         if (cmd.hasOption("json")) {
-
+            String jsonPath = cmd.getOptionValue("json").replace("/", File.separator);
             JsonObject jsonResult = new JsonObject();
             JsonArray jsonOutput = new JsonArray();
 
@@ -164,7 +167,7 @@ public class LayoutAnalysisEvaluator {
             //mean f1-score
             JsonObject meanf1content = new JsonObject();
             meanf1content.add("name", new JsonPrimitive("meanf1score"));
-            meanf1content.add("value", new JsonPrimitive(results[5]));
+            meanf1content.add("value", new JsonPrimitive(results[4]));
             meanf1content.add("mime-type", new JsonPrimitive("text/plain"));
 
             JsonObject meanf1 = new JsonObject();
@@ -174,7 +177,7 @@ public class LayoutAnalysisEvaluator {
             //mean precision
             JsonObject meanprecisioncontent = new JsonObject();
             meanprecisioncontent.add("name", new JsonPrimitive("meanprecision"));
-            meanprecisioncontent.add("value", new JsonPrimitive(results[6]));
+            meanprecisioncontent.add("value", new JsonPrimitive(results[5]));
             meanprecisioncontent.add("mime-type", new JsonPrimitive("text/plain"));
 
             JsonObject meanprecision = new JsonObject();
@@ -184,7 +187,7 @@ public class LayoutAnalysisEvaluator {
             //mean recall
             JsonObject meanrecallcontent = new JsonObject();
             meanrecallcontent.add("name", new JsonPrimitive("meanrecall"));
-            meanrecallcontent.add("value", new JsonPrimitive(results[7]));
+            meanrecallcontent.add("value", new JsonPrimitive(results[6]));
             meanrecallcontent.add("mime-type", new JsonPrimitive("text/plain"));
 
             JsonObject meanrecall = new JsonObject();
@@ -194,7 +197,7 @@ public class LayoutAnalysisEvaluator {
             //f1-score
             JsonObject f1scorecontent = new JsonObject();
             f1scorecontent.add("name", new JsonPrimitive("f1score"));
-            f1scorecontent.add("value", new JsonPrimitive(results[8]));
+            f1scorecontent.add("value", new JsonPrimitive(results[7]));
             f1scorecontent.add("mime-type", new JsonPrimitive("text/plain"));
 
             JsonObject f1score = new JsonObject();
@@ -204,7 +207,7 @@ public class LayoutAnalysisEvaluator {
             //precision
             JsonObject precisioncontent = new JsonObject();
             precisioncontent.add("name", new JsonPrimitive("precision"));
-            precisioncontent.add("value", new JsonPrimitive(results[9]));
+            precisioncontent.add("value", new JsonPrimitive(results[8]));
             precisioncontent.add("mime-type", new JsonPrimitive("text/plain"));
 
             JsonObject precision = new JsonObject();
@@ -214,15 +217,43 @@ public class LayoutAnalysisEvaluator {
             //recall
             JsonObject recallcontent = new JsonObject();
             recallcontent.add("name", new JsonPrimitive("recall"));
-            recallcontent.add("value", new JsonPrimitive(results[10]));
+            recallcontent.add("value", new JsonPrimitive(results[9]));
             recallcontent.add("mime-type", new JsonPrimitive("text/plain"));
 
             JsonObject recall = new JsonObject();
             recall.add("number", recallcontent);
             jsonOutput.add(recall);
 
+            //visualization
+            if(visualization != null) {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                String ext = FilenameUtils.getExtension(visualizationFilePath);
+                ImageIO.write(visualization, ext, baos);
+                OutputStream b64 = new com.lowagie.text.pdf.codec.Base64.OutputStream(os);
+                ImageIO.write(visualization, ext, b64);
+                JsonObject fileContent = new JsonObject();
+                String mimeType = null;
+                try {
+                    mimeType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(baos.toByteArray()));
+                } catch (IOException e) {
+                    System.out.println(e.getLocalizedMessage());
+                }
+                fileContent.add("mime-type", new JsonPrimitive(mimeType));
+                fileContent.add("name", new JsonPrimitive("errorVisualization."+ext));
+                fileContent.add("content", new JsonPrimitive(os.toString("UTF-8")));
+                JsonObject opts = new JsonObject();
+                opts.add("type", new JsonPrimitive("rbgimage"));
+                opts.add("visualization", new JsonPrimitive(true));
+                fileContent.add("options", opts);
+                JsonObject image = new JsonObject();
+                image.add("file", fileContent);
+                jsonOutput.add(image);
+            }
+
+
             jsonResult.add("output", jsonOutput);
-            PrintWriter writer = new PrintWriter(args[4], "utf-8");
+            PrintWriter writer = new PrintWriter(jsonPath, "utf-8");
             writer.print(jsonResult);
             writer.close();
         }
