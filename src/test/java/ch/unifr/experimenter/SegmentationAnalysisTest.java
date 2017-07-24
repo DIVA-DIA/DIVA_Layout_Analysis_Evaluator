@@ -2,15 +2,13 @@
  * Copyright (c) 2017 UniFR
  * University of Fribourg, Switzerland.
  */
-
 package ch.unifr.experimenter;
 
+import ch.unifr.experimenter.SegmentationAnalysis;
 import org.junit.Test;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * This class test whether the class SegmentationAnalysis is correct

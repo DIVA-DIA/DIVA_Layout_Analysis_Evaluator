@@ -29,9 +29,19 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+            <version>2.1.7</version>
+        </dependency>
     </dependencies>
     <build>
-        <finalName>gtEvaluation</finalName>
+        <finalName>LayoutAnalysisEvaluator</finalName>
         <plugins>
             <!-- Set a compiler level -->
             <plugin>
