@@ -6,6 +6,7 @@
 package ch.unifr.experimenter;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.util.Arrays;
  * This code has been written in pair programming by:
  * @author Michele Alberti <michele.alberti@unifr.ch>
  * @author Manuel Bouillon <manuel.bouillon@unifr.ch>
- * @date 28.06.2017
+ * @date 24.07.2017
  * @brief The layout analysis evaluation algorithm
  *
  */
@@ -74,8 +75,20 @@ public class SegmentationAnalysis {
     public SegmentationAnalysis(final BufferedImage gtImage,
                                 final BufferedImage predictionImage,
                                 final int nbClasses) {
-        this.gtImage = gtImage;
-        this.predictionImage = predictionImage;
+
+        assert (gtImage.getWidth() == predictionImage.getWidth());
+        assert (gtImage.getHeight() == predictionImage.getHeight());
+
+        /**
+         * This re-drawing process is mandatory as the type of the prediction image might be different from the one
+         * expected i.e  prediction image is of type GRAYSCALE.
+         */
+        this.gtImage = new BufferedImage(gtImage.getWidth(), gtImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+        this.gtImage.getGraphics().drawImage(gtImage, 0, 0, null);
+
+        this.predictionImage = new BufferedImage(predictionImage.getWidth(), predictionImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+        this.predictionImage.getGraphics().drawImage(predictionImage, 0, 0, null);
+
         this.nbClasses = nbClasses;
     }
 
@@ -94,74 +107,6 @@ public class SegmentationAnalysis {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Public
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * This method takes many values as parameter and gathers them in a nice and consistent way.
-     * It is helpful if a human want to interpret the values visually without the aid of a third
-     * party software.
-     * It is implemented in a static method and not in the toString() to enable printing averaged
-     * values (done externally of this class).
-     *
-     * @param evaluation  see evaluation variable of this class
-     * @param jaccard     see jaccard variable of this class
-     * @param f1          see f1 variable of this class
-     * @param precision   see precision variable of this class
-     * @param recall      see recall variable of this class
-     * @param frequencies see frequencies variable of this class
-     * @return a string containing all values passed as parameter nicely formatted
-     */
-    public static String prettyPrint(double[] evaluation,
-                                     double[] jaccard,
-                                     double[] f1,
-                                     double[] precision,
-                                     double[] recall,
-                                     double[] frequencies) {
-
-        StringBuilder s = new StringBuilder();
-
-        s.append(" EM=").append(String.format("%2.2f", evaluation[0]));
-
-        s.append(" HL=").append(String.format("%2.2f", evaluation[1]));
-
-        s.append(" IU=").append(String.format("%2.2f", evaluation[2])).append(",").append(String.format("%2.2f", evaluation[3]));
-        s.append("[");
-        for (int i = 0; i < jaccard.length; i++) {
-            s.append(String.format("%2.2f", jaccard[i])).append((i < jaccard.length - 1) ? "|" : "");
-        }
-        s.append("]");
-
-        s.append(" ACC=").append(String.format("%2.2f", evaluation[4]));
-
-        s.append(" F1=").append(String.format("%2.2f", evaluation[5])).append(",").append(String.format("%2.2f", evaluation[8]));
-        s.append("[");
-        for (int i = 0; i < f1.length; i++) {
-            s.append(String.format("%2.2f", f1[i])).append((i < f1.length - 1) ? "|" : "");
-        }
-        s.append("]");
-
-        s.append(" P=").append(String.format("%2.2f", evaluation[6])).append(",").append(String.format("%2.2f", evaluation[9]));
-        s.append("[");
-        for (int i = 0; i < precision.length; i++) {
-            s.append(String.format("%2.2f", precision[i])).append((i < precision.length - 1) ? "|" : "");
-        }
-        s.append("]");
-
-        s.append(" R=").append(String.format("%2.2f", evaluation[7])).append(",").append(String.format("%2.2f", evaluation[10]));
-        s.append("[");
-        for (int i = 0; i < recall.length; i++) {
-            s.append(String.format("%2.2f", recall[i])).append((i < recall.length - 1) ? "|" : "");
-        }
-        s.append("]");
-
-        s.append("Freq:[");
-        for (int i = 0; i < frequencies.length; i++) {
-            s.append(String.format("%2.2f", frequencies[i])).append((i < frequencies.length - 1) ? "|" : "");
-        }
-        s.append("]");
-
-        return s.toString();
-    }
-
     /**
      * This method perform the evaluation of the image containing the prediction by comparing it
      * with the ground truth provided. This evaluation is conducted on a multi-class and multi-label
@@ -177,14 +122,12 @@ public class SegmentationAnalysis {
      * [2]  mean Jaccard index (IU)
      * [3]  Jaccard index (IU)                  (frequency weighted)
      *
-     * [4]  accuracy                            (global)
-     *
-     * [5]  mean F1-score
-     * [6]  mean precision
-     * [7]  mean recall
-     * [8]  F1-score                            (frequency weighted)
-     * [9]  precision                           (frequency weighted)
-     * [10] recall                              (frequency weighted)
+     * [4]  mean F1-score
+     * [5]  mean precision
+     * [6]  mean recall
+     * [7]  F1-score                            (frequency weighted)
+     * [8]  precision                           (frequency weighted)
+     * [9]  recall                              (frequency weighted)
      */
     public double[] evaluateImages(){
 
@@ -273,7 +216,7 @@ public class SegmentationAnalysis {
         frequencies = classFrequencies(cm);
 
         // Init the return value array:
-        evaluation = new double[11];
+        evaluation = new double[10];
 
         // Fill the return value vector
         evaluation[0] = exactMatch;
@@ -283,19 +226,17 @@ public class SegmentationAnalysis {
         evaluation[2] = mean(jaccard);
         evaluation[3] = weightedMean(jaccard,frequencies);
 
-        evaluation[4] = computeAccuracy(cm);
-
         precision = computePrecision(cm);
         recall = computeRecall(cm);
         f1 = computeF1(precision,recall);
 
-        evaluation[5] = mean(f1);
-        evaluation[6] = mean(precision);
-        evaluation[7] = mean(recall);
+        evaluation[4] = mean(f1);
+        evaluation[5] = mean(precision);
+        evaluation[6] = mean(recall);
 
-        evaluation[8] = weightedMean(f1,frequencies);
-        evaluation[9] = weightedMean(precision,frequencies);
-        evaluation[10] = weightedMean(recall,frequencies);
+        evaluation[7] = weightedMean(f1,frequencies);
+        evaluation[8] = weightedMean(precision,frequencies);
+        evaluation[9] = weightedMean(recall,frequencies);
 
         return evaluation;
     }
@@ -319,24 +260,34 @@ public class SegmentationAnalysis {
             for (int y = 0; y < gtImage.getHeight(); y++) {
 
                 // Fetch values from the images
-                boolean[] groundTruth = getLabels(gtImage,x,y,nbClasses);
-                boolean[] prediction = getLabels(predictionImage,x,y,nbClasses);
+                boolean[] groundTruth = getLabels(gtImage, x, y, nbClasses);
+                boolean[] prediction = getLabels(predictionImage, x, y, nbClasses);
+
+                /* If Background is predicted - but other classes are present  (e.g. Text instead of Comment)
+                 * mark it as white as this is not allowed
+                 */
+                boolean[] bg = new boolean[nbClasses]; // Dummy input for only BG class
+                bg[0] = true;
+                if (prediction[0] && (hammingLoss(bg, prediction) != 0)){
+                    bi.setRGB(x, y, 0xFFFFFF); // WHITE Background predicted - but other classes are present
+                    continue;
+                }
 
                 if(groundTruth[0] && prediction[0]) {
-                    bi.setRGB(x, y, 0x000000); // BLACK:   Background predicted correctly
+                    bi.setRGB(x, y, 0x000000); // BLACK: Background predicted correctly
                     continue;
                 }
 
                 if (groundTruth[0] && !prediction[0]){
-                    bi.setRGB(x, y, 0xFF0000); // RED:     Background mis-predicted as Foreground
+                    bi.setRGB(x, y, 0xFF0000); // RED: Background mis-predicted as Foreground
                     continue;
                 }
 
                 if (!groundTruth[0] && prediction[0]){
                     if (isBoundary(gtImage,x,y)) {
-                        bi.setRGB(x, y, 0x000000); //  BLACK:   Background predicted correctly
+                        bi.setRGB(x, y, 0x000000); // BLACK: Background predicted on boundary
                     }else {
-                        bi.setRGB(x, y, 0x00FFFF); //  BLUE:    Foreground mis-predicted as Background
+                        bi.setRGB(x, y, 0x00FFFF); // BLUE:  Foreground mis-predicted as Background
                     }
                     continue;
                 }
@@ -354,16 +305,108 @@ public class SegmentationAnalysis {
         return bi;
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Public-static
-    ///////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * This method overlaps the evaluation visualization with the original image to further
+     * enable the user to spot and interpret the mistakes in the prediction
+     * @param visualization the visualization image generated by this.visualizeEvaluation()
+     * @param original the original image as it is in the dataset
+     * @return a BufferedImage representing the overlapped images
+     */
+    public BufferedImage overlapEvaluation(BufferedImage visualization, BufferedImage original){
+
+        assert (visualization.getWidth() == original.getWidth());
+        assert (visualization.getHeight() == original.getHeight());
+
+        // Create new image of type ARGB (with alpha channel)
+        BufferedImage overlap = new BufferedImage(visualization.getWidth(), visualization.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = overlap.getGraphics();
+
+        // Paint original
+        g.drawImage(original, 0, 0, null);
+
+        // Set alpha
+        ((Graphics2D)g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,0.57f));
+
+        // Paint visualization
+        g.drawImage(visualization, 0, 0, null);
+
+        return overlap;
+    }
 
     /**
      * @return this evaluation object nicely formatted
      */
     @Override
-    public String toString() {
-        return prettyPrint(evaluation, jaccard, f1, precision, recall,frequencies);
+    public String toString(){
+        return prettyPrint(evaluation,jaccard,f1,precision,recall,frequencies);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Public-static
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * This method takes many values as parameter and gathers them in a nice and consistent way.
+     * It is helpful if a human want to interpret the values visually without the aid of a third
+     * party software.
+     * It is implemented in a static method and not in the toString() to enable printing averaged
+     * values (done externally of this class).
+     * @param evaluation see evaluation variable of this class
+     * @param jaccard  see jaccard variable of this class
+     * @param f1  see f1 variable of this class
+     * @param precision  see precision variable of this class
+     * @param recall  see recall variable of this class
+     * @param frequencies  see frequencies variable of this class
+     * @return  a string containing all values passed as parameter nicely formatted
+     */
+    public static String prettyPrint(double[] evaluation,
+                                     double[] jaccard,
+                                     double[] f1,
+                                     double[] precision,
+                                     double[] recall,
+                                     double[] frequencies){
+
+        StringBuilder s = new StringBuilder();
+
+        s.append("EM=").append(String.format("%2.2f",evaluation[0]));
+
+        s.append(" HS=").append(String.format("%2.2f",evaluation[1]));
+
+        s.append(" IU=").append(String.format("%2.2f",evaluation[2])).append(",").append(String.format("%2.2f",evaluation[3]));
+        s.append("[");
+        for (int i = 0; i < jaccard.length; i++) {
+            s.append(String.format("%2.2f",jaccard[i])).append((i < jaccard.length-1)? "|" : "");
+        }
+        s.append("]");
+
+        s.append(" F1=").append(String.format("%2.2f",evaluation[4])).append(",").append(String.format("%2.2f",evaluation[7]));
+        s.append("[");
+        for (int i = 0; i < f1.length; i++) {
+            s.append(String.format("%2.2f",f1[i])).append((i < f1.length-1)? "|" : "");
+        }
+        s.append("]");
+
+        s.append(" P=").append(String.format("%2.2f",evaluation[5])).append(",").append(String.format("%2.2f",evaluation[6]));
+        s.append("[");
+        for (int i = 0; i < precision.length; i++) {
+            s.append(String.format("%2.2f",precision[i])).append((i < precision.length-1)? "|" : "");
+        }
+        s.append("]");
+
+        s.append(" R=").append(String.format("%2.2f",evaluation[6])).append(",").append(String.format("%2.2f",evaluation[9]));
+        s.append("[");
+        for (int i = 0; i < recall.length; i++) {
+            s.append(String.format("%2.2f",recall[i])).append((i < recall.length-1)? "|" : "");
+        }
+        s.append("]");
+
+        s.append("Freq:[");
+        for (int i = 0; i < frequencies.length; i++) {
+            s.append(String.format("%2.2f",frequencies[i])).append((i < frequencies.length-1)? "|" : "");
+        }
+        s.append("]");
+
+        return s.toString();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -420,7 +463,7 @@ public class SegmentationAnalysis {
         double weightedMean = 0;
         double totalWeight = 0;
         for (int c = 0; c < values.length; c++) {
-            if (!Double.isNaN(values[c])) {
+            if(!Double.isNaN(values[c])) {
                 weightedMean += values[c] * weights[c];
                 totalWeight += weights[c];
             }
@@ -454,27 +497,6 @@ public class SegmentationAnalysis {
 
         return frequencies;
     }
-
-    /**
-     * Computes global accuracy, from the class-wise binary confusion matrices
-     * @param cm binary confusion matrices for each class in the GT (size must be 2 x 2 x nbClasses)
-     * @return global accuracy
-     */
-    private double computeAccuracy(double[][][] cm){
-        assert (cm.length == 2);
-        assert (cm[0].length == 2);
-
-        final int L = cm[0][0].length;
-
-        double tp = 0;
-        int totalAmountOfLabels = 0;
-        for (int c = 0; c < L; c++) {
-            tp  += cm[0][0][c];
-            totalAmountOfLabels += cm[0][0][c] + cm[0][1][c]; // TP + FN
-        }
-        return tp/totalAmountOfLabels;
-    }
-
 
     /**
      * Computes class-wise Intersection over Union metric, from the class-wise binary confusion matrices
@@ -550,7 +572,6 @@ public class SegmentationAnalysis {
         for (int c = 0; c < L; c++) {
             F1[c] = 2 * precision[c] * recall[c] / (precision[c] + recall[c]);
         }
-
         return F1;
     }
 

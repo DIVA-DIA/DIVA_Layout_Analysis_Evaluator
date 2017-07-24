@@ -5,19 +5,17 @@
 
 package ch.unifr.experimenter;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * This class test whether the class SegmentationAnalysis is correct
- * for the HisDoc Layout Competition of the ICDAR 2017
  *
- * @author Michele Alberti <michele.alberti@unifr.ch>
- * @date 28.06.2017
- * @brief Unit test for the layout analysis evaluator
- *
+ * @author Michele Alberti
  */
 public class SegmentationAnalysisTest {
 
@@ -65,9 +63,6 @@ public class SegmentationAnalysisTest {
          *
          * mean = 0.41964
          * weighted mean = (6*4/7 + 1/4 + 5*2/7 + 5*4/7 ) / 17 = 0.4684
-         * ___________
-         * accuracy                            (global)
-         * (4+1+2+4) / (6+1+5+5) = 11/17 = 0.6470
          * ___________
          * mean F1-score
          * mean precision
@@ -149,21 +144,19 @@ public class SegmentationAnalysisTest {
         assert (results[1] == 0.65);
         assert (Math.abs(results[2] - 0.4196) < 0.0001);
         assert (Math.abs(results[3] - 0.4684) < 0.0001);
-        assert (Math.abs(results[4] - 0.6470) < 0.0001);
-        assert (Math.abs(results[5] - 0.5747) < 0.0001);
-        assert (Math.abs(results[6] - 0.5541) < 0.0001);
-        assert (Math.abs(results[7] - 0.7166) < 0.0001);
-        assert (Math.abs(results[8] - 0.6248) < 0.0001);
-        assert (Math.abs(results[9] - 0.6401) < 0.0001);
-        assert (Math.abs(results[10] - 0.6470) < 0.0001);
+        assert (Math.abs(results[4] - 0.5747) < 0.0001);
+        assert (Math.abs(results[5] - 0.5541) < 0.0001);
+        assert (Math.abs(results[6] - 0.7166) < 0.0001);
+        assert (Math.abs(results[7] - 0.6248) < 0.0001);
+        assert (Math.abs(results[8] - 0.6401) < 0.0001);
+        assert (Math.abs(results[9] - 0.6470) < 0.0001);
     }
 
     @Test
     public void testIdentity() throws IOException {
-
         SegmentationAnalysis segmentationAnalysis = new SegmentationAnalysis(
-                ".\\..\\..\\..\\003-DataSet\\CS863\\training-m\\e-codices_csg-0863_009_max.png",
-                ".\\..\\..\\..\\003-DataSet\\CS863\\training-m\\e-codices_csg-0863_009_max.png",
+                "./test/e-codices_fmb-cb-0055_0098v_max.png",
+                "./test/e-codices_fmb-cb-0055_0098v_max.png",
                 4);
 
         double[] results = segmentationAnalysis.evaluateImages();
@@ -178,7 +171,5 @@ public class SegmentationAnalysisTest {
         assert (results[7] == 1);
         assert (results[8] == 1);
         assert (results[9] == 1);
-        assert (results[10] == 1);
     }
-
 }
