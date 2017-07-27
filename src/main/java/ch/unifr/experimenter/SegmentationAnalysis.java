@@ -558,19 +558,18 @@ public class SegmentationAnalysis {
      * Computes the class-wise F1-score given class-wise precision and recall,
      * i.e the length of precision, recall and F1 vectors is the number of classes in the GT
      * F1 = 2*PRECISION*RECALL / (PRECISION+RECALL)
-     * @param precision class-wise precision
-     * @param recall class-wise recall
+     * @param cm binary confusion matrices for each class in the GT (size must be 2 x 2 x nbClasses)
      * @return class-wise F1-score
      */
-    private double[] computeF1(double[] precision, double[] recall){
-        assert (precision.length == recall.length);
-        final int L = precision.length;
+    private double[] computeF1(double[][][] cm){
+        assert (cm.length == 2);
+        assert (cm[0].length == 2);
+
+        final int L = cm[0][0].length;
 
         double[] F1 = new double[L];
-
-        // F1 score is the harmonic mean of precision and recall
         for (int c = 0; c < L; c++) {
-            F1[c] = 2 * precision[c] * recall[c] / (precision[c] + recall[c]);
+            F1[c] = 2*cm[0][0][c] / (2*cm[0][0][c] +  cm[0][1][c] + cm[1][0][c]);
         }
         return F1;
     }
