@@ -3,7 +3,7 @@
  * University of Fribourg, Switzerland.
  */
 
-package ch.unifr.experimenter;
+package ch.unifr;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

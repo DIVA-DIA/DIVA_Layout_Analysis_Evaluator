@@ -3,7 +3,7 @@
  * University of Fribourg, Switzerland.
  */
 
-package ch.unifr.experimenter;
+package ch.unifr;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -228,7 +228,7 @@ public class SegmentationAnalysis {
 
         precision = computePrecision(cm);
         recall = computeRecall(cm);
-        f1 = computeF1(precision,recall);
+        f1 = computeF1(cm);
 
         evaluation[4] = mean(f1);
         evaluation[5] = mean(precision);
