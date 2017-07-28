@@ -44,10 +44,10 @@ public class LayoutAnalysisEvaluatorTool {
         options.addOption(output);
 
         // Visualize evaluation as image (optional)
-        options.addOption(new Option("dv", "DisableVisualization", false, "Flag whether visualizing the evaluation as image is NOT desired"));
+        options.addOption(new Option("dv", "disableVisualization", false, "Flag whether visualizing the evaluation as image is NOT desired"));
 
-        // Original image input path (optional)
-        options.addOption(new Option("o", "original", true, "Original image file path"));
+        // Overlap original image input path (optional)
+        options.addOption(new Option("o", "overlap", true, "Overlap original image file path"));
 
         // Output path, relative to prediction input path (optional)
         options.addOption(new Option("out", "outputPath", true, "Output path, relative to prediction input path"));
@@ -110,9 +110,9 @@ public class LayoutAnalysisEvaluatorTool {
             ImageIO.write(visualization, "png", new File(visualizationFilePath));
             System.out.println("Visualization image written in: " + visualizationFilePath);
 
-            if (cmd.hasOption("original")) {
+            if (cmd.hasOption("overlap")) {
                 String overlapFilePath = outputPath + ".overlap.png";
-                ImageIO.write(segmentationAnalysis.overlapEvaluation(visualization, ImageIO.read(new File(cmd.getOptionValue("original")))), "png", new File(overlapFilePath));
+                ImageIO.write(segmentationAnalysis.overlapEvaluation(visualization, ImageIO.read(new File(cmd.getOptionValue("overlap")))), "png", new File(overlapFilePath));
                 System.out.println("Overlap image written in: " + overlapFilePath);
             }
         }
