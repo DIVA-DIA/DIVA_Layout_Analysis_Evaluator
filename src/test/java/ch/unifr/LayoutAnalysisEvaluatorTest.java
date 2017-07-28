@@ -133,7 +133,7 @@ public class LayoutAnalysisEvaluatorTest {
         prediction.setRGB(0,8,0x000001); // B
         prediction.setRGB(0,9,0x00000A); // TC
 
-        SegmentationAnalysis segmentationAnalysis = new SegmentationAnalysis(groundTruth, prediction, 4);
+        LayoutAnalysisEvaluator segmentationAnalysis = new LayoutAnalysisEvaluator(groundTruth, prediction, 4);
 
         double[] results = segmentationAnalysis.evaluateImages();
 
@@ -151,7 +151,7 @@ public class LayoutAnalysisEvaluatorTest {
 
     @Test
     public void testIdentity() throws IOException {
-        SegmentationAnalysis segmentationAnalysis = new SegmentationAnalysis(
+        LayoutAnalysisEvaluator segmentationAnalysis = new LayoutAnalysisEvaluator(
                 "./test/e-codices_fmb-cb-0055_0098v_max.png",
                 "./test/e-codices_fmb-cb-0055_0098v_max.png",
                 4);

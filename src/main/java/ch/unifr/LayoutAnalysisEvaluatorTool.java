@@ -8,7 +8,6 @@ package ch.unifr;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
 
@@ -25,7 +24,7 @@ import java.net.URLConnection;
  * @date 24.07.2017
  * @brief The layout analysis evaluator main class
  */
-public class LayoutAnalysisEvaluator {
+public class LayoutAnalysisEvaluatorTool {
 
     public static void main(String[] args) throws Exception {
 
@@ -93,7 +92,7 @@ public class LayoutAnalysisEvaluator {
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
         // Run the evaluation
-        SegmentationAnalysis segmentationAnalysis = new SegmentationAnalysis(groundTruthImagePath, predictionImagePath, 4);
+        LayoutAnalysisEvaluator segmentationAnalysis = new LayoutAnalysisEvaluator(groundTruthImagePath, predictionImagePath, 4);
         double[] results = segmentationAnalysis.evaluateImages();
 
         // Print the metric used to determine winner in competition
