@@ -2,9 +2,8 @@
  * Copyright (c) 2017 UniFR
  * University of Fribourg, Switzerland.
  */
-package ch.unifr.experimenter;
+package ch.unifr;
 
-import ch.unifr.experimenter.SegmentationAnalysis;
 import org.junit.Test;
 
 import java.awt.image.BufferedImage;
@@ -15,7 +14,7 @@ import java.io.IOException;
  *
  * @author Michele Alberti
  */
-public class SegmentationAnalysisTest {
+public class LayoutAnalysisEvaluatorTest {
 
     @Test
     public void testToyExample() throws IOException {
