@@ -50,7 +50,7 @@ public class LayoutAnalysisEvaluatorTool {
         options.addOption(new Option("o", "overlap", true, "Overlap original image file path"));
 
         // Output path, relative to prediction input path (optional)
-        options.addOption(new Option("out", "outputPath", true, "Output path, relative to prediction input path"));
+        options.addOption(new Option("out", "outputPath", true, "Output path, absolute or relative to prediction input path"));
 
         // Result file as JSON (optional)
         options.addOption(new Option("j", "json", true, "Json Path, for the DIVAServices JSON output"));
@@ -72,15 +72,20 @@ public class LayoutAnalysisEvaluatorTool {
         String predictionImagePath = cmd.getOptionValue("prediction").replace("/", File.separator);
 
         // Set the path of the prediction as starting output path
-        String outputPath = predictionImagePath.substring(0,predictionImagePath.lastIndexOf(File.separator)+1);
+        String outputPath = predictionImagePath.substring(0, predictionImagePath.lastIndexOf(File.separator) + 1);
 
         // Add any relative path from there (if specified)
-        if(cmd.hasOption("outputPath")){
-            outputPath += cmd.getOptionValue("outputPath").replace("/", File.separator);
+        if (cmd.hasOption("outputPath")) {
+            File file = new File(cmd.getOptionValue("outputPath"));
+            if (file.isAbsolute()) {
+                outputPath = cmd.getOptionValue("outputPath").replace("/", File.separator);
+            } else {
+                outputPath += cmd.getOptionValue("outputPath").replace("/", File.separator);
+            }
         }
 
         // Make sure last char is a file separator
-        if (outputPath.lastIndexOf(File.separator)+1 != outputPath.length()) {
+        if (outputPath.lastIndexOf(File.separator) + 1 != outputPath.length()) {
             outputPath += File.separator;
         }
 
@@ -104,7 +109,7 @@ public class LayoutAnalysisEvaluatorTool {
         BufferedImage visualization = null;
         // If desired, visualize the evaluation and save the image on file
         String visualizationFilePath = null;
-        if(!cmd.hasOption("DisableVisualization")) {
+        if (!cmd.hasOption("DisableVisualization")) {
             visualizationFilePath = outputPath + ".visualization.png";
             visualization = segmentationAnalysis.visualiseEvaluation();
             ImageIO.write(visualization, "png", new File(visualizationFilePath));
@@ -224,7 +229,7 @@ public class LayoutAnalysisEvaluatorTool {
             jsonOutput.add(recall);
 
             //visualization
-            if(visualization != null) {
+            if (visualization != null) {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 String ext = FilenameUtils.getExtension(visualizationFilePath);
@@ -239,7 +244,7 @@ public class LayoutAnalysisEvaluatorTool {
                     System.out.println(e.getLocalizedMessage());
                 }
                 fileContent.add("mime-type", new JsonPrimitive(mimeType));
-                fileContent.add("name", new JsonPrimitive("errorVisualization."+ext));
+                fileContent.add("name", new JsonPrimitive("errorVisualization." + ext));
                 fileContent.add("content", new JsonPrimitive(os.toString("UTF-8")));
                 JsonObject opts = new JsonObject();
                 opts.add("type", new JsonPrimitive("rbgimage"));
