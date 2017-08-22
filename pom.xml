@@ -64,7 +64,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <!-- Jar file entry point -->
-                            <mainClass>ch.unifr.LayoutAnalysisEvaluator</mainClass>
+                            <mainClass>ch.unifr.LayoutAnalysisEvaluatorTool</mainClass>
                             <classpathPrefix>dependency-jars/</classpathPrefix>
                         </manifest>
                     </archive>
