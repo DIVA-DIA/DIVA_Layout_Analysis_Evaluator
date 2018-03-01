@@ -228,37 +228,8 @@ public class LayoutAnalysisEvaluatorTool {
             recall.add("number", recallcontent);
             jsonOutput.add(recall);
 
-            //visualization
-            if (visualization != null) {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                String ext = FilenameUtils.getExtension(visualizationFilePath);
-                ImageIO.write(visualization, ext, baos);
-                OutputStream b64 = new com.lowagie.text.pdf.codec.Base64.OutputStream(os);
-                ImageIO.write(visualization, ext, b64);
-                JsonObject fileContent = new JsonObject();
-                String mimeType = null;
-                try {
-                    mimeType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(baos.toByteArray()));
-                } catch (IOException e) {
-                    System.out.println(e.getLocalizedMessage());
-                }
-                fileContent.add("mime-type", new JsonPrimitive(mimeType));
-                fileContent.add("name", new JsonPrimitive("errorVisualization." + ext));
-                fileContent.add("content", new JsonPrimitive(os.toString("UTF-8")));
-                JsonObject opts = new JsonObject();
-                opts.add("type", new JsonPrimitive("rbgimage"));
-                opts.add("visualization", new JsonPrimitive(true));
-                fileContent.add("options", opts);
-                JsonObject image = new JsonObject();
-                image.add("file", fileContent);
-                jsonOutput.add(image);
-            }
-
-
-            jsonResult.add("output", jsonOutput);
             PrintWriter writer = new PrintWriter(jsonPath, "utf-8");
-            writer.print(jsonResult);
+            writer.print(jsonOutput);
             writer.close();
         }
     }
