@@ -53,3 +53,24 @@ original image like in (right).
 
 ![Alt text](examples/visualization_error.png?raw=true)
 ![Alt text](examples/overlap_error.png?raw=true)
+
+## Citing us
+
+If you use our software, please cite our paper as:
+
+``` latex
+@inproceedings{alberti2017evaluation,
+    address = {Kyoto, Japan},
+    archivePrefix = {arXiv},
+    arxivId = {1712.01656},
+    author = {Alberti, Michele and Bouillon, Manuel and Ingold, Rolf and Liwicki, Marcus},
+    booktitle = {2017 14th IAPR International Conference on Document Analysis and Recognition (ICDAR)},
+    doi = {10.1109/ICDAR.2017.311},
+    eprint = {1712.01656},
+    isbn = {978-1-5386-3586-5},
+    month = {nov},
+    pages = {43--47},
+    title = {{Open Evaluation Tool for Layout Analysis of Document Images}},
+    year = {2017}
+}
+```
