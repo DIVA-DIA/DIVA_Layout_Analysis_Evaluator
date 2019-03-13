@@ -9,12 +9,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.commons.cli.*;
-import org.apache.commons.io.FilenameUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.net.URLConnection;
+import java.io.File;
+import java.io.PrintWriter;
 
 /**
  * This class provides a runnable main for using the SegmentationAnalysis tool
@@ -97,7 +96,7 @@ public class LayoutAnalysisEvaluatorTool {
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
         // Run the evaluation
-        LayoutAnalysisEvaluator segmentationAnalysis = new LayoutAnalysisEvaluator(groundTruthImagePath, predictionImagePath, 4);
+        LayoutAnalysisEvaluator segmentationAnalysis = new LayoutAnalysisEvaluator(groundTruthImagePath, predictionImagePath);
         double[] results = segmentationAnalysis.evaluateImages();
 
         // Print the metric used to determine winner in competition
@@ -106,12 +105,10 @@ public class LayoutAnalysisEvaluatorTool {
         // Print all metrics computed
         System.out.println(segmentationAnalysis);
 
-        BufferedImage visualization = null;
         // If desired, visualize the evaluation and save the image on file
-        String visualizationFilePath = null;
         if (!cmd.hasOption("DisableVisualization")) {
-            visualizationFilePath = outputPath + ".visualization.png";
-            visualization = segmentationAnalysis.visualiseEvaluation();
+            String visualizationFilePath = outputPath + ".visualization.png";
+            BufferedImage visualization = segmentationAnalysis.visualiseEvaluation();
             ImageIO.write(visualization, "png", new File(visualizationFilePath));
             System.out.println("Visualization image written in: " + visualizationFilePath);
 

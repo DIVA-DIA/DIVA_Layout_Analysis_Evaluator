@@ -107,7 +107,7 @@ public class LayoutAnalysisEvaluatorTest {
          * main text body+decoration : 0b...1000 | 0b...0100 = 0b...1100 = 0x00000C
          * comment +decoration : 0b...0010 | 0b...0100 = 0b...0110 = 0x000006
          *
-         * RGB=0b10...0000=0x800000: boundary pixel (to be combined with one of the classe, expect background)
+         * RGB=0b10...0000=0x800000: boundary pixel (to be combined with one of the class, expect background)
          *
          */
 
@@ -133,7 +133,7 @@ public class LayoutAnalysisEvaluatorTest {
         prediction.setRGB(0,8,0x000001); // B
         prediction.setRGB(0,9,0x00000A); // TC
 
-        LayoutAnalysisEvaluator segmentationAnalysis = new LayoutAnalysisEvaluator(groundTruth, prediction, 4);
+        LayoutAnalysisEvaluator segmentationAnalysis = new LayoutAnalysisEvaluator(groundTruth, prediction);
 
         double[] results = segmentationAnalysis.evaluateImages();
 
@@ -155,10 +155,31 @@ public class LayoutAnalysisEvaluatorTest {
     public void testIdentity() throws IOException {
         LayoutAnalysisEvaluator segmentationAnalysis = new LayoutAnalysisEvaluator(
                 "./test/e-codices_csg-0863_004_max_gt.png",
-                "./test/e-codices_csg-0863_004_max_gt.png",
-                4);
+                "./test/e-codices_csg-0863_004_max_gt.png");
 
         double[] results = segmentationAnalysis.evaluateImages();
+
+        assert (results[0] == 1);
+        assert (results[1] == 1);
+        assert (results[2] == 1);
+        assert (results[3] == 1);
+        assert (results[4] == 1);
+        assert (results[5] == 1);
+        assert (results[6] == 1);
+        assert (results[7] == 1);
+        assert (results[8] == 1);
+        assert (results[9] == 1);
+    }
+
+    @Test
+    public void testClassNumber() throws IOException {
+        LayoutAnalysisEvaluator segmentationAnalysis = new LayoutAnalysisEvaluator(
+                "./test/ICDAR/testfile_image004533645_00059_gt.png",
+                "./test/ICDAR/testfile_image004533645_00059_gt.png");
+
+        double[] results = segmentationAnalysis.evaluateImages();
+
+        System.out.println(segmentationAnalysis);
 
         assert (results[0] == 1);
         assert (results[1] == 1);

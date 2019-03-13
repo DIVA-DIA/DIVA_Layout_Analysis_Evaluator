@@ -70,11 +70,9 @@ public class LayoutAnalysisEvaluator {
      * the ground truth and the predicted values.
      * @param gtImage ground truth (multi-label!) image representation
      * @param predictionImage prediction of the algorithm (multi-label!) image representation
-     * @param nbClasses total number of different classes in the GT
      */
     public LayoutAnalysisEvaluator(final BufferedImage gtImage,
-                                   final BufferedImage predictionImage,
-                                   final int nbClasses) {
+                                   final BufferedImage predictionImage) {
 
         assert (gtImage.getWidth() == predictionImage.getWidth());
         assert (gtImage.getHeight() == predictionImage.getHeight());
@@ -89,7 +87,10 @@ public class LayoutAnalysisEvaluator {
         this.predictionImage = new BufferedImage(predictionImage.getWidth(), predictionImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
         this.predictionImage.getGraphics().drawImage(predictionImage, 0, 0, null);
 
-        this.nbClasses = nbClasses;
+        // Set the number of classes to be the largest class detected in the GT
+        this.nbClasses = getLargestClassLocation(this.gtImage);
+
+
     }
 
     /**
@@ -97,11 +98,10 @@ public class LayoutAnalysisEvaluator {
      * rather than on memory.
      * @param gtImagePath path to the ground truth (multi-label!) image representation
      * @param resultImagePath path to the prediction of the algorithm (multi-label!) image representation
-     * @param nbClasses total number of different classes in the GT
      * @throws IOException in case there are issues with opening the files
      */
-    public LayoutAnalysisEvaluator(String gtImagePath, String resultImagePath, int nbClasses) throws IOException {
-        this(ImageIO.read(new File(gtImagePath)),ImageIO.read(new File(resultImagePath)),nbClasses);
+    public LayoutAnalysisEvaluator(String gtImagePath, String resultImagePath) throws IOException {
+        this(ImageIO.read(new File(gtImagePath)), ImageIO.read(new File(resultImagePath)));
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ public class LayoutAnalysisEvaluator {
         }
         s.append("]");
 
-        s.append(" P=").append(String.format("%2.2f", evaluation[5])).append(",").append(String.format("%2.2f", evaluation[6]));
+        s.append(" P=").append(String.format("%2.2f", evaluation[5])).append(",").append(String.format("%2.2f", evaluation[8]));
         s.append("[");
         for (int i = 0; i < precision.length; i++) {
             s.append(String.format("%2.2f", precision[i])).append((i < precision.length - 1) ? "|" : "");
@@ -477,7 +477,7 @@ public class LayoutAnalysisEvaluator {
     /**
      * Computes the class frequencies from the class-wise binary confusion matrices
      * @param cm binary confusion matrices for each class in the GT (size must be 2 x 2 x nbClasses)
-     * @return class accuracies in an array, where the total sum of frequencies equals 1
+     * @return class frequencies in an array, where the total sum of frequencies equals 1
      */
     private double[] classFrequencies(double[][][] cm){
         assert (cm.length == 2);
@@ -625,4 +625,48 @@ public class LayoutAnalysisEvaluator {
         return ((gtImage.getRGB(x, y)>>23) & 0x1) == 1;
     }
 
+    /**
+     * Find the highest value on the blue channel and return its log_2+1
+     * For example, if the highest value is the decimal '8' (1000b, 0x8) the return value is 4, as it is
+     * the fourth bit.
+     *
+     * @param bi the image to iterate trough
+     * @return log_2(highest value on the blue channel) + 1
+     */
+    private int getLargestClassLocation(BufferedImage bi) {
+        int max = 0;
+        for (int y = 0; y < bi.getHeight(); y++) {
+            for (int x = 0; x < bi.getWidth(); x++) {
+                int value = bi.getRaster().getPixel(x, y, new int[3])[2];
+                if (value >= max) {
+                    max = value;
+                }
+            }
+        }
+        return findPositionOfMSB(max) + 1;
+    }
+
+    /**
+     * Find position of MSB (Most Significant Bit) in binary representation of an integer.
+     * For example, binary representation of 4 is 100 and the MSB in it is present at position 2
+     * Similarly, binary representation of 99 is 1 100 011 and the MSB in it is present at position 6.
+     * Code adapted from: https://prismoskills.appspot.com/lessons/Bitwise_Operators/Find_position_of_MSB.jsp
+     *
+     * @param n number of which we want to find the MSB location
+     * @return the position of the MSB
+     */
+    private int findPositionOfMSB(int n) {
+        int high = 31, low = 0;
+
+        while (high - low > 1) {
+            int mid = (high + low) / 2;
+            int maskHigh = (1 << high) - (1 << mid);
+            if ((maskHigh & n) > 0) {
+                low = mid;
+            } else {
+                high = mid;
+            }
+        }
+        return low;
+    }
 }
