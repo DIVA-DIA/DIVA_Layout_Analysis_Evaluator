@@ -137,8 +137,6 @@ public class LayoutAnalysisEvaluatorTest {
 
         double[] results = segmentationAnalysis.evaluateImages();
 
-        System.out.println(segmentationAnalysis.toString());
-
         assert (results[0] == 0.3);
         assert (results[1] == 0.65);
         assert (Math.abs(results[2] - 0.4196) < 0.0001);
@@ -154,8 +152,8 @@ public class LayoutAnalysisEvaluatorTest {
     @Test
     public void testIdentity() throws IOException {
         LayoutAnalysisEvaluator segmentationAnalysis = new LayoutAnalysisEvaluator(
-                "./test/e-codices_csg-0863_004_max_gt.png",
-                "./test/e-codices_csg-0863_004_max_gt.png");
+                "./test/ICDAR2017/e-codices_csg-0863_004_max_gt.png",
+                "./test/ICDAR2017/e-codices_csg-0863_004_max_gt.png");
 
         double[] results = segmentationAnalysis.evaluateImages();
 
@@ -174,12 +172,10 @@ public class LayoutAnalysisEvaluatorTest {
     @Test
     public void testClassNumber() throws IOException {
         LayoutAnalysisEvaluator segmentationAnalysis = new LayoutAnalysisEvaluator(
-                "./test/ICDAR/testfile_image004533645_00059_gt.png",
-                "./test/ICDAR/testfile_image004533645_00059_gt.png");
+                "./test/ICDAR2019/testfile_image004533645_00059_gt.png",
+                "./test/ICDAR2019/testfile_image004533645_00059_gt.png");
 
         double[] results = segmentationAnalysis.evaluateImages();
-
-        System.out.println(segmentationAnalysis);
 
         assert (results[0] == 1);
         assert (results[1] == 1);
