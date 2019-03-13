@@ -137,6 +137,8 @@ public class LayoutAnalysisEvaluatorTest {
 
         double[] results = segmentationAnalysis.evaluateImages();
 
+        System.out.println(segmentationAnalysis.toString());
+
         assert (results[0] == 0.3);
         assert (results[1] == 0.65);
         assert (Math.abs(results[2] - 0.4196) < 0.0001);
@@ -152,8 +154,8 @@ public class LayoutAnalysisEvaluatorTest {
     @Test
     public void testIdentity() throws IOException {
         LayoutAnalysisEvaluator segmentationAnalysis = new LayoutAnalysisEvaluator(
-                "./test/e-codices_fmb-cb-0055_0098v_max.png",
-                "./test/e-codices_fmb-cb-0055_0098v_max.png",
+                "./test/e-codices_csg-0863_004_max_gt.png",
+                "./test/e-codices_csg-0863_004_max_gt.png",
                 4);
 
         double[] results = segmentationAnalysis.evaluateImages();
