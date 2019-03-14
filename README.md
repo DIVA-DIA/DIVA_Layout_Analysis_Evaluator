@@ -1,5 +1,9 @@
 # LayoutAnalysisEvaluator
-Layout Analysis Evaluator for the ICDAR 2017 competition on Layout Analysis for Challenging Medieval Manuscripts
+
+
+Layout Analysis Evaluator for:
+  * [ICDAR 2019 Historical Document Reading Challenge on Large Structured Chinese Family Records](https://www.ltu.se/research/subjects/Maskininlarning/ICDAR-2019-HDRC-Chinese?l=en "ICDAR 2019 Historical Document Reading Challenge on Large Structured Chinese Family Records Homepage")
+  * [ICDAR 2017 competition on Layout Analysis for Challenging Medieval Manuscripts](https://diuf.unifr.ch/main/hisdoc/icdar2017-hisdoc-layout-comp "ICDAR 2017 competition on Layout Analysis for Challenging Medieval Manuscripts Homepage")
 
 Minimal usage: `java -jar LayoutAnalysisEvaluator.jar -gt gt_image.png -p prediction_image.png`
 
