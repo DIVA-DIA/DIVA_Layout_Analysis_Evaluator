@@ -58,6 +58,34 @@ original image like in (right).
 ![Alt text](examples/visualization_error.png?raw=true)
 ![Alt text](examples/overlap_error.png?raw=true)
 
+
+## Ground Truth Format
+
+The ground truth information needs to be a pixel-label image where the class information is encoded in the blue
+channel. 
+Red and green channels should be set to 0 with the exception of the boundaries pixels used in the two competitions mentioned above.
+
+For example, in the DIVA-HisDB dataset there are four different annotated classes which might overlap:
+main text body, decorations, comments and background.  
+
+In the pixel-label images the classes are encoded by RGB values as follows:
+
+    Red = 0 everywhere (except boundaries)
+    Green = 0 everywhere
+    
+    Blue = 0b00...1000 = 0x000008: main text body
+    Blue = 0b00...0100 = 0x000004: decoration
+    Blue = 0b00...0010 = 0x000002: comment
+    Blue = 0b00...0001 = 0x000001: background (out of page)
+
+Note that the GT might contain multi-class labeled pixels, for all classes except for the background.
+For example:
+
+    Blue = 0b...1000 | 0b...0010 = 0b...1010 = 0x00000A : main text body + comment  
+    Blue = 0b...1000 | 0b...0100 = 0b...1100 = 0x00000C : main text body + decoration
+    Blue = 0b...0010 | 0b...0100 = 0b...0110 = 0x000006 : comment + decoration
+
+
 ## Citing us
 
 If you use our software, please cite our paper as:
