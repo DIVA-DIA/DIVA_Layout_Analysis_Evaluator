@@ -106,7 +106,7 @@ public class LayoutAnalysisEvaluatorTool {
         System.out.println(segmentationAnalysis);
 
         // If desired, visualize the evaluation and save the image on file
-        if (!cmd.hasOption("DisableVisualization")) {
+        if (!cmd.hasOption("disableVisualization")) {
             String visualizationFilePath = outputPath + ".visualization.png";
             BufferedImage visualization = segmentationAnalysis.visualiseEvaluation();
             ImageIO.write(visualization, "png", new File(visualizationFilePath));
