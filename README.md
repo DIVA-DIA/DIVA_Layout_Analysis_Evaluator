@@ -14,7 +14,7 @@ Parameters list: utility-name
  -o,--original <arg>          (Optional) Original image, to be overlapped with the results visualization
  -j,--json <arg>              (Optional) Json Path, for the DIVAServices JSON output
  -out,--outputPath <arg>      (Optional) Output path (relative to prediction input path)                            
- -dv,--DisableVisualization   (Optional)(Flag) Vsualizing the evaluation as image is NOT desired
+ -dv,--disableVisualization   (Optional)(Flag) Vsualizing the evaluation as image is NOT desired
  ```
 **Note:** this also outputs a human-friendly visualization of the results next to the
  `prediction_image.png` which can be overlapped to the original image if provided 
